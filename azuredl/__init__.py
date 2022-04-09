@@ -3,6 +3,7 @@ import warnings
 from pickle import load
 
 import azure.functions as func
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
@@ -22,5 +23,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     return func.HttpResponse(
         status_code=200,
-        body=f"{model.predict(preprocessor.transform(pd.DataFrame(req.get_json())))}",
+        body=f"{np.argmax(model.predict(preprocessor.transform(pd.DataFrame(req.get_json()))))}",
     )
