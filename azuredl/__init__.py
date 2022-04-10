@@ -15,13 +15,12 @@ warnings.filterwarnings("ignore")
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("*******Starting main function*******")
     logging.info(f"Request query: {req.get_json()}")
-
     preprocessor = load(open("dl_preprocessor/dl_preprocessor.pkl", "rb"))
     model = keras.models.load_model("dl_model")
-
-    logging.info("*******Finishing main function*******")
-
+    payload = pd.DataFrame(
+        {k: [None] if next(iter(v)) == "" else v for k, v in req.get_json().items()}
+    )
     return func.HttpResponse(
         status_code=200,
-        body=f"{np.argmax(model.predict(preprocessor.transform(pd.DataFrame(req.get_json()))))}",
+        body=f"{np.argmax(model.predict(preprocessor.transform(payload)))}",
     )
