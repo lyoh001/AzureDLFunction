@@ -18,9 +18,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     preprocessor = load(open("dl_preprocessor/dl_preprocessor.pkl", "rb"))
     model = keras.models.load_model("dl_model")
     payload = pd.DataFrame(
-        {k: [None] if next(iter(v)) == "" else v for k, v in req.get_json().items()}
+        {k: [np.nan] if next(iter(v)) == "" else v for k, v in req.get_json().items()},
+        dtype="object",
     )
+    logging.info("*******Finishing main function*******")
     return func.HttpResponse(
         status_code=200,
-        body=f"{np.argmax(model.predict(preprocessor.transform(payload)))}",
+        body=["setosa", "versicolor", "virginica"][
+            np.argmax(model.predict(preprocessor.transform(payload)))
+        ],
     )
